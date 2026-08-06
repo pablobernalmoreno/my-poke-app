@@ -3,73 +3,67 @@
     {
       "name": "Charizard",
       "moves": ["will o wisp", "Outrage", "Flame charge", "Swords dance"],
-      "abilities": "Blaze",
+      "abilities": ["Blaze", "Solar Power"],
       "stat": "Quiet"
     },
     {
       "name": "Gengar",
       "moves": ["Shadow ball", "Sludge wave", "Icy wind", "Destiniy bond"],
-      "abilities": "Cursed body",
+      "abilities": ["Cursed body"],
       "stat": "Timid"
     },
     {
       "name": "Azumarill",
       "moves": ["Play rough", "Aqua jet", "Brick break", "Belly drum"],
-      "abilities": "Huge Power",
+      "abilities": ["Huge power", "Thick fat", "Sap sipper"],
       "stat": "Adamant"
     },
     {
       "name": "Steelix",
       "moves": ["Heavy slam", "Earthquake", "Body press", "Stealth rock"],
-      "abilities": "Sturdy",
+      "abilities": ["Sturdy", "Rock head", "Sheer force"],
       "stat": "Adamant"
     },
     {
       "name": "Whimsicott",
       "moves": ["Moonblast", "Giga drain", "Leech seed", "Memento"],
-      "abilities": "Prankster",
+      "abilities": ["Prankster", "Infiltrator", "Chlorophyll"],
       "stat": "Timid"
     },
     {
       "name": "Drampa",
       "moves": ["Draco meteor", "Hyper voice", "Flamethrower", "Thunderbolt"],
-      "abilities": "Berserk",
+      "abilities": ["Berserk", "Sap sipper", "Cloud nine"],
       "stat": "Modest"
     },
     {
       "name": "Raichu",
       "moves": ["Thunderbolt", "Play rough", "Drain punch", "Trailblaze"],
-      "abilities": "Lighning rod",
+      "abilities": ["Lightning rod", "Static"],
       "stat": "Mild"
     },
     {
       "name": "Dragonite",
       "moves": ["Dragon dance", "Surf", "Dragon rush", "Extreme speed"],
-      "abilities": "Multiscale",
+      "abilities": ["Multiscale", "Inner focus"],
       "stat": "Quiet"
     },
     {
       "name": "Metagross",
       "moves": ["Meteor mash", "Focus punch", "Thunder punch", "Ice punch"],
-      "abilities": "Light metal",
+      "abilities": ["Light metal", "Clear body"],
       "stat": "Lax"
     },
     {
       "name": "Toucannon",
       "moves": ["U turn", "Gunk shot", "Acrobatics", "Flame charge"],
-      "abilities": "Sheer force",
+      "abilities": ["Sheer force", "Skill link", "Keen eye"],
       "stat": "Lonely"
     },
     {
       "name": "Swampert",
       "moves": ["Earthquake", "Sludge wave", "Waterfall", "Ice beam"],
-      "abilities": "Torrent",
-      "stat": "Brave"
-    },
-    {
-      "name": "Swampert",
-      "moves": ["Earthquake", "Sludge wave", "Waterfall", "Ice beam"],
-      "abilities": "Torrent",
+      "abilities": ["Torrent", "Damp"],
       "stat": "Brave"
     }
   ],

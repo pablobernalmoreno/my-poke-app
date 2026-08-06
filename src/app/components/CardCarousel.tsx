@@ -1,97 +1,85 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useRef, useDeferredValue } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const POKEMON_PAGE_SIZE = 12;
-
-const DEFAULT_ASSETS = [
-  {
-    src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
-    title: "Sunset Beach",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80",
-    title: "Misty Mountains",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=600&q=80",
-    title: "Forest Trail",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=600&q=80",
-    title: "Sunlight Woods",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=600&q=80",
-    title: "Green Hills",
-  },
-];
+import PokemonSearchBar from "./PokemonSearchBar";
+import {
+  fetchPokemonPage,
+  POKEMON_PAGE_SIZE,
+  searchPokemonByName,
+  type CarouselImage,
+  type PokemonPageData,
+} from "../data/pokemonApi";
 
 interface CardCarouselProps {
   className?: string;
-  images?: { src: string; title: string }[];
-}
-
-interface PokemonListItem {
-  name: string;
-  url: string;
-}
-
-interface PokemonListResponse {
-  count: number;
-  results: PokemonListItem[];
-}
-
-function getPokemonIdFromUrl(url: string): number | null {
-  const match = url.match(/\/pokemon\/(\d+)\/?$/);
-  return match ? Number(match[1]) : null;
+  images?: CarouselImage[];
+  initialPokemonData?: PokemonPageData | null;
 }
 
 export default function CardCarousel({
   className = "",
-  images = DEFAULT_ASSETS,
+  images = [],
+  initialPokemonData = null,
 }: CardCarouselProps) {
-  const [fetchedImages, setFetchedImages] = useState<{ src: string; title: string }[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPokemonCount, setTotalPokemonCount] = useState(10326);
-  const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [pendingActiveIndex, setPendingActiveIndex] = useState<number | null>(null);
-  const [activeIndex, setActiveIndex] = useState(2);
-  const [isHovered, setIsHovered] = useState(false);
+  const MIN_SEARCH_LENGTH = 2;
+  const SEARCH_RESULTS_LIMIT = 60;
 
-  const carouselImages = fetchedImages.length > 0 ? fetchedImages : images;
+  const [fetchedImages, setFetchedImages] = useState<CarouselImage[]>(
+    initialPokemonData?.images ?? [],
+  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPokemonCount, setTotalPokemonCount] = useState(
+    initialPokemonData?.count ?? 10326,
+  );
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const [pendingActiveIndex, setPendingActiveIndex] = useState<number | null>(
+    null,
+  );
+  const [activeIndex, setActiveIndex] = useState(
+    Math.min(2, Math.max(0, (initialPokemonData?.images ?? images).length - 1)),
+  );
+  const [isHovered, setIsHovered] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<CarouselImage[]>([]);
+  const [isSearchingPokemon, setIsSearchingPokemon] = useState(false);
+  const shouldSkipInitialFetch = useRef(Boolean(initialPokemonData));
+  const pendingActiveIndexRef = useRef<number | null>(pendingActiveIndex);
+
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+  const normalizedQuery = deferredSearchTerm.trim().toLowerCase();
+  const immediateQuery = searchTerm.trim().toLowerCase();
+  const isSearching = normalizedQuery.length >= MIN_SEARCH_LENGTH;
+  const isQueryTooShort =
+    immediateQuery.length > 0 && immediateQuery.length < MIN_SEARCH_LENGTH;
+
+  const pageImages = fetchedImages.length > 0 ? fetchedImages : images;
+  const carouselImages = isSearching ? searchResults : pageImages;
   const maxIndex = Math.max(0, carouselImages.length - 1);
   const safeActiveIndex = Math.min(activeIndex, maxIndex);
-  const totalPages = Math.max(1, Math.ceil(totalPokemonCount / POKEMON_PAGE_SIZE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalPokemonCount / POKEMON_PAGE_SIZE),
+  );
 
   useEffect(() => {
+    pendingActiveIndexRef.current = pendingActiveIndex;
+  }, [pendingActiveIndex]);
+
+  useEffect(() => {
+    if (currentPage === 1 && shouldSkipInitialFetch.current) {
+      shouldSkipInitialFetch.current = false;
+      return;
+    }
+
     let isCancelled = false;
 
     const fetchData = async () => {
       setIsLoadingPage(true);
 
       try {
-        const offset = (currentPage - 1) * POKEMON_PAGE_SIZE;
-        const response = await axios.get<PokemonListResponse>(
-          `https://pokeapi.co/api/v2/pokemon?limit=${POKEMON_PAGE_SIZE}&offset=${offset}`,
-        );
-
-        const { count, results } = response.data;
-        const pageImages = results
-          .map(({ name, url }) => {
-            const id = getPokemonIdFromUrl(url);
-            if (!id) {
-              return null;
-            }
-
-            return {
-              src: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
-              title: name,
-            };
-          })
-          .filter((item): item is { src: string; title: string } => item !== null);
+        const { count, images: pageImages } =
+          await fetchPokemonPage(currentPage);
 
         if (isCancelled) {
           return;
@@ -99,8 +87,11 @@ export default function CardCarousel({
 
         setTotalPokemonCount(count);
 
-        const nextIndex = pendingActiveIndex ?? 0;
-        const safeNextIndex = Math.max(0, Math.min(nextIndex, Math.max(0, pageImages.length - 1)));
+        const nextIndex = pendingActiveIndexRef.current ?? 0;
+        const safeNextIndex = Math.max(
+          0,
+          Math.min(nextIndex, Math.max(0, pageImages.length - 1)),
+        );
 
         if (pageImages.length > 0) {
           setFetchedImages(pageImages);
@@ -130,6 +121,42 @@ export default function CardCarousel({
     };
   }, [currentPage]);
 
+  useEffect(() => {
+    if (!isSearching) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    const runSearch = async () => {
+      try {
+        const results = await searchPokemonByName(
+          normalizedQuery,
+          SEARCH_RESULTS_LIMIT,
+        );
+        if (!isCancelled) {
+          setSearchResults(results);
+          setActiveIndex(0);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error("Failed to search Pokemon", error);
+          setSearchResults([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsSearchingPokemon(false);
+        }
+      }
+    };
+
+    runSearch();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [normalizedQuery, isSearching]);
+
   const toPokemonPage = (nextPage: number) => {
     setCurrentPage((prev) => {
       const page = Math.max(1, Math.min(nextPage, totalPages));
@@ -151,7 +178,7 @@ export default function CardCarousel({
       return;
     }
 
-    if (currentPage > 1) {
+    if (!isSearching && currentPage > 1) {
       setPendingActiveIndex(POKEMON_PAGE_SIZE - 1);
       toPokemonPage(currentPage - 1);
     }
@@ -168,7 +195,7 @@ export default function CardCarousel({
       return;
     }
 
-    if (currentPage < totalPages) {
+    if (!isSearching && currentPage < totalPages) {
       setPendingActiveIndex(0);
       toPokemonPage(currentPage + 1);
     }
@@ -179,6 +206,19 @@ export default function CardCarousel({
     setActiveIndex(Math.max(0, Math.min(index, maxIndex)));
   };
 
+  const onSearchChange = (value: string) => {
+    setSearchTerm(value);
+
+    const normalizedValue = value.trim().toLowerCase();
+    if (!normalizedValue || normalizedValue.length < MIN_SEARCH_LENGTH) {
+      setSearchResults([]);
+      setIsSearchingPokemon(false);
+      return;
+    }
+
+    setIsSearchingPokemon(true);
+  };
+
   const slideWidth = 160;
 
   return (
@@ -187,13 +227,33 @@ export default function CardCarousel({
       onMouseLeave={() => setIsHovered(false)}
       className={`w-full h-full flex flex-col items-center justify-center relative overflow-hidden select-none ${className}`}
     >
+      <PokemonSearchBar
+        value={searchTerm}
+        onChange={onSearchChange}
+        isLoading={isSearching && isSearchingPokemon}
+      />
+
       <div className="mb-3 flex items-center gap-2 text-xs text-neutral-300">
-        <span>
-          Page {currentPage} / {totalPages} ({totalPokemonCount.toLocaleString()} Pokemon)
-        </span>
+        {isQueryTooShort ? (
+          <span>Type at least {MIN_SEARCH_LENGTH} characters to search.</span>
+        ) : isSearching ? (
+          <span>
+            {searchResults.length.toLocaleString()} results for &quot;
+            {normalizedQuery}&quot;
+          </span>
+        ) : (
+          <span>
+            Page {currentPage} / {totalPages} (
+            {totalPokemonCount.toLocaleString()} Pokemon)
+          </span>
+        )}
       </div>
 
-      {isLoadingPage ? <p className="mb-2 text-xs text-neutral-400">Loading Pokemon page...</p> : null}
+      {isLoadingPage || (isSearching && isSearchingPokemon) ? (
+        <p className="mb-2 text-xs text-neutral-400">
+          {isSearching ? "Searching Pokemon..." : "Loading Pokemon page..."}
+        </p>
+      ) : null}
 
       <div
         className="relative h-[180px] flex items-center justify-start overflow-visible"

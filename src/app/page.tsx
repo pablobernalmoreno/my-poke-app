@@ -1,6 +1,13 @@
-import CardCarousel from "./CardCarousel";
 
-export default function Home() {
+import CardCarousel from "./components/CardCarousel";
+import { fetchPokemonPage } from "./data/pokemonApi";
+
+export default async function Home() {
+  const initialPokemonData = await fetchPokemonPage(1).catch((error) => {
+    console.error("Failed to fetch initial Pokemon data", error);
+    return null;
+  });
+
   return (
     <main
       style={{
@@ -21,7 +28,7 @@ export default function Home() {
         </p>
         <h1 style={{ marginTop: "8px", fontSize: "32px", fontWeight: 600 }}>Explore the collection</h1>
       </div>
-      <CardCarousel />
+      <CardCarousel initialPokemonData={initialPokemonData} />
     </main>
   );
 }
