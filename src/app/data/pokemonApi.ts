@@ -22,6 +22,11 @@ export interface PokemonPageData {
   images: CarouselImage[];
 }
 
+export interface PokemonSearchPageData {
+  count: number;
+  images: CarouselImage[];
+}
+
 let cachedPokemonCatalog: PokemonListItem[] | null = null;
 
 function getPokemonIdFromUrl(url: string): number | null {
@@ -75,18 +80,27 @@ export async function fetchPokemonPage(page: number): Promise<PokemonPageData> {
 
 export async function searchPokemonByName(
   query: string,
-  limit = 100,
-): Promise<CarouselImage[]> {
+  page = 1,
+  limit = POKEMON_PAGE_SIZE,
+): Promise<PokemonSearchPageData> {
   const normalizedQuery = query.trim().toLowerCase();
   if (!normalizedQuery) {
-    return [];
+    return {
+      count: 0,
+      images: [],
+    };
   }
 
   const allPokemon = await getPokemonCatalog();
+  const matches = allPokemon.filter((item) => item.name.includes(normalizedQuery));
+  const safePage = Math.max(1, page);
+  const offset = (safePage - 1) * limit;
 
-  return allPokemon
-    .filter((item) => item.name.includes(normalizedQuery))
-    .slice(0, limit)
-    .map((item) => toCarouselImage(item))
-    .filter((item): item is CarouselImage => item !== null);
+  return {
+    count: matches.length,
+    images: matches
+      .slice(offset, offset + limit)
+      .map((item) => toCarouselImage(item))
+      .filter((item): item is CarouselImage => item !== null),
+  };
 }

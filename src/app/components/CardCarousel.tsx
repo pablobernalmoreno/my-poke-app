@@ -1,15 +1,10 @@
 "use client";
-import React, { useState, useEffect, useRef, useDeferredValue } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PokemonSearchBar from "./PokemonSearchBar";
-import {
-  fetchPokemonPage,
-  POKEMON_PAGE_SIZE,
-  searchPokemonByName,
-  type CarouselImage,
-  type PokemonPageData,
-} from "../data/pokemonApi";
+import { usePokemonCarousel } from "./usePokemonCarousel";
+import { type CarouselImage, type PokemonPageData } from "../data/pokemonApi";
 
 interface CardCarouselProps {
   className?: string;
@@ -22,202 +17,28 @@ export default function CardCarousel({
   images = [],
   initialPokemonData = null,
 }: CardCarouselProps) {
-  const MIN_SEARCH_LENGTH = 2;
-  const SEARCH_RESULTS_LIMIT = 60;
-
-  const [fetchedImages, setFetchedImages] = useState<CarouselImage[]>(
-    initialPokemonData?.images ?? [],
-  );
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPokemonCount, setTotalPokemonCount] = useState(
-    initialPokemonData?.count ?? 10326,
-  );
-  const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [pendingActiveIndex, setPendingActiveIndex] = useState<number | null>(
-    null,
-  );
-  const [activeIndex, setActiveIndex] = useState(
-    Math.min(2, Math.max(0, (initialPokemonData?.images ?? images).length - 1)),
-  );
   const [isHovered, setIsHovered] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<CarouselImage[]>([]);
-  const [isSearchingPokemon, setIsSearchingPokemon] = useState(false);
-  const shouldSkipInitialFetch = useRef(Boolean(initialPokemonData));
-  const pendingActiveIndexRef = useRef<number | null>(pendingActiveIndex);
-
-  const deferredSearchTerm = useDeferredValue(searchTerm);
-  const normalizedQuery = deferredSearchTerm.trim().toLowerCase();
-  const immediateQuery = searchTerm.trim().toLowerCase();
-  const isSearching = normalizedQuery.length >= MIN_SEARCH_LENGTH;
-  const isQueryTooShort =
-    immediateQuery.length > 0 && immediateQuery.length < MIN_SEARCH_LENGTH;
-
-  const pageImages = fetchedImages.length > 0 ? fetchedImages : images;
-  const carouselImages = isSearching ? searchResults : pageImages;
-  const maxIndex = Math.max(0, carouselImages.length - 1);
-  const safeActiveIndex = Math.min(activeIndex, maxIndex);
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalPokemonCount / POKEMON_PAGE_SIZE),
-  );
-
-  useEffect(() => {
-    pendingActiveIndexRef.current = pendingActiveIndex;
-  }, [pendingActiveIndex]);
-
-  useEffect(() => {
-    if (currentPage === 1 && shouldSkipInitialFetch.current) {
-      shouldSkipInitialFetch.current = false;
-      return;
-    }
-
-    let isCancelled = false;
-
-    const fetchData = async () => {
-      setIsLoadingPage(true);
-
-      try {
-        const { count, images: pageImages } =
-          await fetchPokemonPage(currentPage);
-
-        if (isCancelled) {
-          return;
-        }
-
-        setTotalPokemonCount(count);
-
-        const nextIndex = pendingActiveIndexRef.current ?? 0;
-        const safeNextIndex = Math.max(
-          0,
-          Math.min(nextIndex, Math.max(0, pageImages.length - 1)),
-        );
-
-        if (pageImages.length > 0) {
-          setFetchedImages(pageImages);
-          setActiveIndex(safeNextIndex);
-        } else {
-          setFetchedImages([]);
-          setActiveIndex(0);
-        }
-
-        setPendingActiveIndex(null);
-      } catch (error) {
-        if (!isCancelled) {
-          console.error("Failed to fetch Pokemon images", error);
-        }
-        setPendingActiveIndex(null);
-      } finally {
-        if (!isCancelled) {
-          setIsLoadingPage(false);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [currentPage]);
-
-  useEffect(() => {
-    if (!isSearching) {
-      return;
-    }
-
-    let isCancelled = false;
-
-    const runSearch = async () => {
-      try {
-        const results = await searchPokemonByName(
-          normalizedQuery,
-          SEARCH_RESULTS_LIMIT,
-        );
-        if (!isCancelled) {
-          setSearchResults(results);
-          setActiveIndex(0);
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          console.error("Failed to search Pokemon", error);
-          setSearchResults([]);
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsSearchingPokemon(false);
-        }
-      }
-    };
-
-    runSearch();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [normalizedQuery, isSearching]);
-
-  const toPokemonPage = (nextPage: number) => {
-    setCurrentPage((prev) => {
-      const page = Math.max(1, Math.min(nextPage, totalPages));
-      if (page === prev) {
-        return prev;
-      }
-      return page;
-    });
-  };
-
-  const toPrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isLoadingPage) {
-      return;
-    }
-
-    if (safeActiveIndex > 0) {
-      setActiveIndex((prev) => Math.max(0, Math.min(prev, maxIndex) - 1));
-      return;
-    }
-
-    if (!isSearching && currentPage > 1) {
-      setPendingActiveIndex(POKEMON_PAGE_SIZE - 1);
-      toPokemonPage(currentPage - 1);
-    }
-  };
-
-  const toNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isLoadingPage) {
-      return;
-    }
-
-    if (safeActiveIndex < maxIndex) {
-      setActiveIndex((prev) => Math.min(maxIndex, Math.max(0, prev) + 1));
-      return;
-    }
-
-    if (!isSearching && currentPage < totalPages) {
-      setPendingActiveIndex(0);
-      toPokemonPage(currentPage + 1);
-    }
-  };
-
-  const toSlide = (e: React.MouseEvent, index: number) => {
-    e.stopPropagation();
-    setActiveIndex(Math.max(0, Math.min(index, maxIndex)));
-  };
-
-  const onSearchChange = (value: string) => {
-    setSearchTerm(value);
-
-    const normalizedValue = value.trim().toLowerCase();
-    if (!normalizedValue || normalizedValue.length < MIN_SEARCH_LENGTH) {
-      setSearchResults([]);
-      setIsSearchingPokemon(false);
-      return;
-    }
-
-    setIsSearchingPokemon(true);
-  };
+  const {
+    carouselImages,
+    currentPage,
+    isLoadingPage,
+    isQueryTooShort,
+    isSearching,
+    isSearchingPokemon,
+    minSearchLength,
+    normalizedQuery,
+    onSearchChange,
+    safeActiveIndex,
+    searchPage,
+    searchResultCount,
+    searchTerm,
+    searchTotalPages,
+    toNext,
+    toPrev,
+    toSlide,
+    totalPages,
+    totalPokemonCount,
+  } = usePokemonCarousel({ images, initialPokemonData });
 
   const slideWidth = 160;
 
@@ -235,11 +56,12 @@ export default function CardCarousel({
 
       <div className="mb-3 flex items-center gap-2 text-xs text-neutral-300">
         {isQueryTooShort ? (
-          <span>Type at least {MIN_SEARCH_LENGTH} characters to search.</span>
+          <span>Type at least {minSearchLength} characters to search.</span>
         ) : isSearching ? (
           <span>
-            {searchResults.length.toLocaleString()} results for &quot;
-            {normalizedQuery}&quot;
+            Page {searchPage} / {searchTotalPages} (
+            {searchResultCount.toLocaleString()} results for &quot;
+            {normalizedQuery}&quot;)
           </span>
         ) : (
           <span>

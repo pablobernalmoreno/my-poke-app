@@ -1,4 +1,3 @@
-
 import CardCarousel from "./components/CardCarousel";
 import { fetchPokemonPage } from "./data/pokemonApi";
 
@@ -23,10 +22,9 @@ export default async function Home() {
       }}
     >
       <div style={{ textAlign: "center", marginBottom: "24px" }}>
-        <p style={{ fontSize: "12px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#94a3b8" }}>
-          Featured picks
-        </p>
-        <h1 style={{ marginTop: "8px", fontSize: "32px", fontWeight: 600 }}>Explore the collection</h1>
+        <h1 style={{ marginTop: "8px", fontSize: "32px", fontWeight: 600 }}>
+          Explore the pokeworld!
+        </h1>
       </div>
       <CardCarousel initialPokemonData={initialPokemonData} />
     </main>
