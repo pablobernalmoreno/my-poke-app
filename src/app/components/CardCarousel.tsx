@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import PokemonSearchBar from "./PokemonSearchBar";
 import { usePokemonCarousel } from "./usePokemonCarousel";
 import { type CarouselImage, type PokemonPageData } from "../data/pokemonApi";
+import styles from "./CardCarousel.module.css";
+import { Box, CircularProgress } from "@mui/material";
 
 interface CardCarouselProps {
   className?: string;
@@ -46,7 +48,7 @@ export default function CardCarousel({
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`w-full h-full flex flex-col items-center justify-center relative overflow-hidden select-none ${className}`}
+      className={`${styles.wrapper} ${className}`}
     >
       <PokemonSearchBar
         value={searchTerm}
@@ -54,7 +56,7 @@ export default function CardCarousel({
         isLoading={isSearching && isSearchingPokemon}
       />
 
-      <div className="mb-3 flex items-center gap-2 text-xs text-neutral-300">
+      <div className={styles.statusBar}>
         {isQueryTooShort ? (
           <span>Type at least {minSearchLength} characters to search.</span>
         ) : isSearching ? (
@@ -72,17 +74,20 @@ export default function CardCarousel({
       </div>
 
       {isLoadingPage || (isSearching && isSearchingPokemon) ? (
-        <p className="mb-2 text-xs text-neutral-400">
-          {isSearching ? "Searching Pokemon..." : "Loading Pokemon page..."}
-        </p>
+        <Box sx={{ display: "flex" }}>
+          <CircularProgress aria-label="Loading…" />
+          <p className={styles.loadingText}>
+            {isSearching ? "Searching Pokemon..." : "Loading Pokemon page..."}
+          </p>
+        </Box>
       ) : null}
 
       <div
-        className="relative h-[180px] flex items-center justify-start overflow-visible"
+        className={styles.slideViewport}
         style={{ width: `${slideWidth}px` }}
       >
         <motion.div
-          className="flex w-fit items-center"
+          className={styles.slideTrack}
           animate={{ x: -safeActiveIndex * slideWidth }}
           transition={{ type: "spring", bounce: 0.1, duration: 0.8 }}
         >
@@ -97,7 +102,7 @@ export default function CardCarousel({
             return (
               <motion.div
                 key={i}
-                className="shrink-0 flex flex-col items-center gap-1.5 will-change-[transform,scale]"
+                className={styles.slide}
                 style={{ width: `${slideWidth}px` }}
                 animate={{
                   rotate: targetRotate,
@@ -107,45 +112,46 @@ export default function CardCarousel({
                 transition={{ type: "spring", bounce: 0.2, duration: 0.8 }}
               >
                 <div
-                  className={`text-[10px] md:text-xs font-semibold whitespace-nowrap transition-all duration-300 ${isActive ? "opacity-100 scale-100 text-white" : "opacity-0 scale-75 text-neutral-400"}`}
+                  className={`${styles.slideTitle} ${isActive ? styles.slideTitleActive : styles.slideTitleInactive}`}
                 >
                   {item.title}
                 </div>
-
-                <img
-                  src={item.src}
-                  alt={item.title}
-                  referrerPolicy="no-referrer"
-                  className="w-[110px] h-[110px] object-cover rounded-xl shadow-lg border border-white/10 cursor-pointer"
-                  onClick={(e) => toSlide(e, i)}
-                />
+                <>
+                  <button
+                    onClick={() => console.log(`Favorito ${item.title}`)}
+                    className={styles.favoriteBtn}
+                  >
+                    Favorito
+                  </button>
+                  <img
+                    src={item.src}
+                    alt={item.title}
+                    referrerPolicy="no-referrer"
+                    className={styles.pokemonImage}
+                    onClick={(e) => toSlide(e, i)}
+                  />
+                </>
               </motion.div>
             );
           })}
         </motion.div>
       </div>
 
-      <div className="mt-4 px-1.5 py-0.5 flex items-center gap-2 justify-center text-neutral-400 rounded-full bg-neutral-900/60 backdrop-blur-md border border-white/5 shadow-md z-20">
-        <button
-          onClick={toPrev}
-          className="p-1 cursor-pointer hover:bg-white/5 rounded-full transition-colors border-0 bg-transparent text-neutral-400 hover:text-white"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
+      <div className={styles.controls}>
+        <button onClick={toPrev} className={styles.navBtn}>
+          <ChevronLeft style={{ width: "0.875rem", height: "0.875rem" }} />
         </button>
-        <div className="flex justify-center items-center gap-1">
+        <div className={styles.dots}>
           {carouselImages.map((_, i) => (
             <div
               key={i}
               onClick={(e) => toSlide(e, i)}
-              className={`rounded-full cursor-pointer h-1 transition-all duration-300 ${safeActiveIndex === i ? "w-4 bg-white" : "w-1 bg-white/30 hover:bg-white/50"}`}
-            ></div>
+              className={`${styles.dot} ${safeActiveIndex === i ? styles.dotActive : styles.dotInactive}`}
+            />
           ))}
         </div>
-        <button
-          onClick={toNext}
-          className="p-1 cursor-pointer hover:bg-white/5 rounded-full transition-colors border-0 bg-transparent text-neutral-400 hover:text-white"
-        >
-          <ChevronRight className="w-3.5 h-3.5" />
+        <button onClick={toNext} className={styles.navBtn}>
+          <ChevronRight style={{ width: "0.875rem", height: "0.875rem" }} />
         </button>
       </div>
     </div>
