@@ -82,10 +82,7 @@ export default function CardCarousel({
         </Box>
       ) : null}
 
-      <div
-        className={styles.slideViewport}
-        style={{ width: `${slideWidth}px` }}
-      >
+      <div className={styles.slideViewport}>
         <motion.div
           className={styles.slideTrack}
           animate={{ x: -safeActiveIndex * slideWidth }}
@@ -103,7 +100,6 @@ export default function CardCarousel({
               <motion.div
                 key={i}
                 className={styles.slide}
-                style={{ width: `${slideWidth}px` }}
                 animate={{
                   rotate: targetRotate,
                   scale: targetScale,
@@ -139,7 +135,7 @@ export default function CardCarousel({
 
       <div className={styles.controls}>
         <button onClick={toPrev} className={styles.navBtn}>
-          <ChevronLeft style={{ width: "0.875rem", height: "0.875rem" }} />
+          <ChevronLeft className={styles.navIcon} />
         </button>
         <div className={styles.dots}>
           {carouselImages.map((_, i) => (
@@ -151,7 +147,7 @@ export default function CardCarousel({
           ))}
         </div>
         <button onClick={toNext} className={styles.navBtn}>
-          <ChevronRight style={{ width: "0.875rem", height: "0.875rem" }} />
+          <ChevronRight className={styles.navIcon} />
         </button>
       </div>
     </div>

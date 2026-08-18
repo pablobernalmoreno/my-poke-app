@@ -27,6 +27,7 @@
 
 .slideViewport {
   position: relative;
+  width: 160px;
   height: 180px;
   display: flex;
   align-items: center;
@@ -42,11 +43,17 @@
 
 .slide {
   flex-shrink: 0;
+  width: 160px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.375rem;
   will-change: transform;
+}
+
+.navIcon {
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
 .slideTitle {

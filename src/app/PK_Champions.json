@@ -65,6 +65,12 @@
       "moves": ["Earthquake", "Sludge wave", "Waterfall", "Ice beam"],
       "abilities": ["Torrent", "Damp"],
       "stat": "Brave"
+    },
+    {
+      "name": "Aegislash",
+      "moves": ["Iron head", "Kings shield", "Iron defense", "Shadow sneak"],
+      "abilities": ["Stance change"],
+      "stat": "Adamant"
     }
   ],
   "Items": [
@@ -74,5 +80,181 @@
     "Sitrus berry",
     "white herb",
     "Quick claw"
+  ],
+  "Items_that_can_be_bought": [
+    "Muscle band",
+    "Wise glasses",
+    "Expert belt",
+    "Life orb",
+    "Metronome",
+    "Big root",
+    "Light clay",
+    "Heat rock",
+    "Icy rock",
+    "Smooth rock",
+    "Damp rock",
+    "Wide lens",
+    "Zoom lens",
+    "Iron ball",
+    "Shed shell",
+    "Silk scarf",
+    "Miracle seed",
+    "Charcoal",
+    "Mystic water",
+    "Magnet",
+    "Silver powder",
+    "Sharp beak",
+    "Hard stone",
+    "Poison barb",
+    "Soft sand",
+    "Never melt ice",
+    "Black belt",
+    "Twisted spoon",
+    "Spell tag",
+    "Dragon fang",
+    "Black glasses",
+    "Metal coat",
+    "Fairy feather",
+    "Mental herb",
+    "Shell bell",
+    "Cheri berry",
+    "Chesto berry",
+    "Pecha berry",
+    "Rawst berry",
+    "Aspear berry",
+    "Persim berry",
+    "Leppa berry",
+    "Oran berry",
+    "Chilan berry",
+    "Rindo berry",
+    "Occa berry",
+    "Passho berry",
+    "Wacan berry",
+    "Tanga berry",
+    "Coba berry",
+    "Charti berry",
+    "Kebia berry",
+    "Shuca berry",
+    "Yache berry",
+    "Chople berry",
+    "Payapa berry",
+    "Kasib berry",
+    "Haban berry",
+    "Colbur berry",
+    "Babiri berry",
+    "Roseli berry",
+    "Scope lens",
+    "Light ball"
+  ],
+  "Line_up": [
+    {
+      "name": "Malamar",
+      "moves": ["Knock off", "Facade", "Foul play", "Superpower"],
+      "abilities": ["Contrary"],
+      "stat": "Adamant"
+    },
+    {
+      "name": "Torterra",
+      "moves": ["Bullet seed", "Grassy glide", "Trailblaze", "Hard press"],
+      "abilities": ["Overgrow"],
+      "stat": "Brave"
+    },
+    {
+      "name": "Eelektross",
+      "moves": [
+        "Supercell slam",
+        "Electric terrain",
+        "Thunder punch",
+        "Heavy slam"
+      ],
+      "abilities": ["Levitate"],
+      "stat": "Brave"
+    },
+    {
+      "name": "Aegislash",
+      "moves": ["Iron head", "Kings shield", "Iron defense", "Aerial ace"],
+      "abilities": ["Stance change"],
+      "stat": "Adamant"
+    },
+    {
+      "name": "Rotom",
+      "moves": ["Thunderbolt", "Nasty plot", "Pain split", "Thunder"],
+      "abilities": ["Levitate"],
+      "stat": "Quiet"
+    },
+    {
+      "name": "Florges",
+      "moves": ["Moonblast", "Pollen puff", "Giga drain", "Dazzling gleam"],
+      "abilities": ["Symbiosis"],
+      "stat": "Calm"
+    },
+    {
+      "name": "Golurk",
+      "moves": ["Earthquake", "Poltergeist", "Thief", "Phantom force"],
+      "abilities": ["Klutz"],
+      "stat": "Jolly"
+    },
+    {
+      "name": "Lycanroc",
+      "moves": ["Rock slide", "Counter", "Thunder fang", "Play rough"],
+      "abilities": ["Keen eye"],
+      "stat": "Lonely"
+    },
+    {
+      "name": "Chimecho",
+      "moves": ["Psychic", "Metal sound", "Charge beam", "Cosmic power"],
+      "abilities": ["Levitate"],
+      "stat": "Timid"
+    },
+    {
+      "name": "Bastiodon",
+      "moves": ["Heavy slam", "Body slam", "Iron tail", "Iron defense"],
+      "abilities": ["Sturdy"],
+      "stat": "Adamant"
+    }
+  ],
+  "Current_team": [
+    {
+      "name": "Charizard",
+      "moves": ["Heat wave", "Flamethrower", "Solar beam", "Protect"],
+      "abilities": ["Solar Power"],
+      "stat": "Modest",
+      "item": "Lum berry"
+    },
+    {
+      "name": "Whimsicott",
+      "moves": ["Sunny day", "Tailwind", "Moonblast", "Helping hand"],
+      "abilities": ["Prankster"],
+      "stat": "Timid",
+      "item": "Focus sash"
+    },
+    {
+      "name": "Raichu",
+      "moves": ["Thunderbolt", "Fake out", "Play rough", "Protect"],
+      "abilities": ["Lightning Rod"],
+      "stat": "Timid",
+      "item": "Sitrus berry"
+    },
+    {
+      "name": "Aegislash",
+      "moves": ["Iron head", "Kings shield", "Iron defense", "Shadow sneak"],
+      "abilities": ["Stance change"],
+      "stat": "Adamant",
+      "item": "Leftovers"
+    },
+    {
+      "name": "Gengar",
+      "moves": ["Shadow ball", "Sludge bomb", "Icy wind", "Destiny bond"],
+      "abilities": ["Cursed Body"],
+      "stat": "Timid",
+      "item": "White herb"
+    },
+    {
+      "name": "Azumarill",
+      "moves": ["Aqua jet", "Play rough", "Brick break", "Protect"],
+      "abilities": ["Huge Power"],
+      "stat": "Adamant",
+      "item": ""
+    }
   ]
 }

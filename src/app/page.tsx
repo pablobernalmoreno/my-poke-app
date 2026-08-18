@@ -1,5 +1,6 @@
 import CardCarousel from "./components/CardCarousel";
 import { fetchPokemonPage } from "./data/pokemonApi";
+import styles from "./page.module.css";
 
 export default async function Home() {
   const initialPokemonData = await fetchPokemonPage(1).catch((error) => {
@@ -8,23 +9,9 @@ export default async function Home() {
   });
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#020617",
-        color: "#f8fafc",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "40px 24px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div style={{ textAlign: "center", marginBottom: "24px" }}>
-        <h1 style={{ marginTop: "8px", fontSize: "32px", fontWeight: 600 }}>
-          Explore the pokeworld!
-        </h1>
+    <main className={styles.main}>
+      <div className={styles.heading}>
+        <h1 className={styles.title}>Explore the pokeworld!</h1>
       </div>
       <CardCarousel initialPokemonData={initialPokemonData} />
     </main>
