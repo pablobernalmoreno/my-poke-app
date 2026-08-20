@@ -167,3 +167,8 @@
 .dotInactive:hover {
   background-color: rgba(255, 255, 255, 0.5);
 }
+
+.favoriteIcon {
+  color: #f87171;
+  font-size: 1.5rem;
+}

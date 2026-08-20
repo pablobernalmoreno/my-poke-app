@@ -6,7 +6,9 @@ import PokemonSearchBar from "./PokemonSearchBar";
 import { usePokemonCarousel } from "./usePokemonCarousel";
 import { type CarouselImage, type PokemonPageData } from "../data/pokemonApi";
 import styles from "./CardCarousel.module.css";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, IconButton } from "@mui/material";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 interface CardCarouselProps {
   className?: string;
@@ -20,6 +22,16 @@ export default function CardCarousel({
   initialPokemonData = null,
 }: CardCarouselProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [favoritePokemonTitle, setFavoritePokemonTitle] = useState<
+    string | null
+  >(null);
+
+  const toggleFavoritePokemon = (title: string) => {
+    setFavoritePokemonTitle((prev) => (prev === title ? null : title));
+  };
+
+  console.log({ favoritePokemonTitle });
+
   const {
     carouselImages,
     currentPage,
@@ -113,12 +125,16 @@ export default function CardCarousel({
                   {item.title}
                 </div>
                 <>
-                  <button
-                    onClick={() => console.log(`Favorito ${item.title}`)}
-                    className={styles.favoriteBtn}
+                  <IconButton
+                    aria-label="Favorite"
+                    onClick={() => toggleFavoritePokemon(item.title)}
                   >
-                    Favorito
-                  </button>
+                    {favoritePokemonTitle === item.title ? (
+                      <FavoriteIcon className={styles.favoriteIcon} />
+                    ) : (
+                      <FavoriteBorderIcon className={styles.favoriteIcon} />
+                    )}
+                  </IconButton>
                   <img
                     src={item.src}
                     alt={item.title}
